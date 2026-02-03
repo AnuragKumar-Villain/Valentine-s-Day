@@ -5,34 +5,39 @@
 <title>Will You Be My Valentine? ❤️</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
-
-body {
+html, body {
   margin: 0;
-  height: 100vh;
-  background: linear-gradient(135deg, #ff4d6d, #ff8fab);
+  padding: 0;
+  height: 100%;
   font-family: 'Poppins', sans-serif;
   overflow: hidden;
 }
 
-/* Center Card */
+/* Background */
+body {
+  background: linear-gradient(135deg, #ff4d6d, #ff8fab);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hearts Canvas */
+#hearts {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Card */
 .card {
-  position: relative;
-  z-index: 10;
   background: white;
   padding: 40px;
   border-radius: 25px;
   text-align: center;
-  width: 340px;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
-  animation: pop 1s ease;
-}
-
-@keyframes pop {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  width: 320px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+  z-index: 2;
 }
 
 h1 {
@@ -82,17 +87,10 @@ button {
   justify-content: center;
   flex-direction: column;
   text-align: center;
-  animation: fadeIn 1s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0 }
-  to { opacity: 1 }
 }
 
 .success h2 {
   font-size: 32px;
-  margin-bottom: 10px;
 }
 
 .success p {
@@ -103,22 +101,9 @@ button {
 
 <body>
 
-  canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-}
+<canvas id="hearts"></canvas>
 
-.card {
-  position: relative;
-  z-index: 10;
-}
-
-<div class="card">
+<div class="card" id="card">
   <h1>Will you be my Valentine? 💘</h1>
   <div class="buttons">
     <button id="yes">Yes 💖</button>
@@ -131,66 +116,66 @@ button {
   <p>I love you ❤️</p>
 </div>
 
-<!-- Romantic Music -->
 <audio id="music" loop>
   <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
 </audio>
 
 <script>
-/* NO button movement (mouse + touch) */
+/* NO button escape */
 const noBtn = document.getElementById("no");
 noBtn.addEventListener("mouseover", moveNo);
 noBtn.addEventListener("touchstart", moveNo);
 
 function moveNo() {
-  const x = Math.random() * 240 - 120;
-  const y = Math.random() * 120 - 60;
+  const x = Math.random() * 200 - 100;
+  const y = Math.random() * 100 - 50;
   noBtn.style.transform = `translate(${x}px, ${y}px)`;
 }
 
-/* YES button */
+/* YES action */
 document.getElementById("yes").addEventListener("click", () => {
-  document.querySelector(".card").style.display = "none";
+  document.getElementById("card").style.display = "none";
   document.getElementById("success").style.display = "flex";
   document.getElementById("music").play();
 });
 
-/* Floating Hearts Canvas */
+/* Floating hearts */
 const canvas = document.getElementById("hearts");
 const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
 
 let hearts = [];
 
-function createHeart() {
+function addHeart() {
   hearts.push({
     x: Math.random() * canvas.width,
     y: canvas.height + 20,
-    size: Math.random() * 20 + 10,
-    speed: Math.random() * 2 + 1
+    r: Math.random() * 6 + 4,
+    v: Math.random() * 1.5 + 0.5
   });
 }
 
-function drawHearts() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "rgba(255,255,255,0.7)";
   hearts.forEach((h, i) => {
     ctx.beginPath();
-    ctx.arc(h.x, h.y, h.size/2, 0, Math.PI * 2);
+    ctx.arc(h.x, h.y, h.r, 0, Math.PI * 2);
     ctx.fill();
-    h.y -= h.speed;
-    if (h.y < -20) hearts.splice(i,1);
+    h.y -= h.v;
+    if (h.y < -20) hearts.splice(i, 1);
   });
+  requestAnimationFrame(draw);
 }
 
-setInterval(createHeart, 300);
-function animate() {
-  drawHearts();
-  requestAnimationFrame(animate);
-}
-animate();
+setInterval(addHeart, 300);
+draw();
 </script>
 
 </body>
